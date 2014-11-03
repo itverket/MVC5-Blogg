@@ -1,0 +1,469 @@
+﻿@{
+    ViewBag.Title = "Oppgaver";
+}
+
+<div class="row">
+    <h2>Oppgaver</h2>
+</div>
+
+<div class="row">
+    <h3>Oppgave 1: Hent prosjektet</h3>
+
+    <div class="task">
+        Gå til <a href="https://github.com/itverket/MVC5-Blogg">https://github.com/itverket/MVC5-Blogg</a> og clone solution i Visual Studio eller "Download ZIP". For å åpne prosjektet i Visual Studio, åpner man BloggApplication.sln-filen. Trykk ctrl + f5 for å kjøre prosjektet deres og automatisk lage databasen dere skal bruke.
+    </div>
+</div>
+
+<div class="row">
+    <h3>Oppgave 2: Logg inn</h3>
+
+    <div class="task">
+        Oppgave: Start med å gå til Web.config -filen i rotmappen under BlogApplication-prosjektet. Her vil du se følgende xml-snutt:
+        <pre>
+&lt;appsettings&gt;
+        .
+        .
+        .
+&lt;add key="username" value="user" /&gt;
+&lt;add key="password" value="password123" /&gt;
+        .
+        .
+        .
+&lt;/appsettings&gt;
+        </pre>
+        Bruk brukernavnet "user" og passordet "password123" for å logge inn, eller endre ‘value’ feltene her for å ha en egendefinert bruker.
+
+        Det kreves at bruker er innlogget for å kunne legge til nye blogginnlegg, samt fjerne kommentarer eller endre ‘Om meg’-siden.
+
+        Dersom web.config-filen endres, så må applikasjonen restartes for at endringene blir tatt i bruk. Dersom man prøver å endre .cs-filer, så må koden kompileres på nytt for at endringene blir tatt i bruk (No worries: koden kompileres automatisk når du starter å debugge på nytt).
+    </div>
+</div>
+
+<div class="row">
+    <h3>Oppgave 3: About</h3>
+    
+    <div class="task">
+        Som dere kan se, har vi en “About”-side. Denne siden skal inneholde informasjon om eieren av siden (deg!). Vi har allerede konstruert modellen (Models/AboutInformationViewModel.cs) for denne siden, alt dere trenger å gjøre er å vise de manglende feltene fra modellen i viewet Views/Home/About.cshtml. Foreløpig er det bare fornavn som blir vist, men vi vil gjerne at man skal kunne se etternavn, bursdag og ‘om meg’ feltene.
+    </div>
+
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        I denne oppgaven trenger dere kun å redigere viewet About.cshtml.
+
+        Noen nyttige hjelpemetoder:
+
+        &#64;Html.LabelFor(m => m.property, “LabelTekst”) : Printer en label-tag for feltet.
+        &#64;Model.Property : Printer verdien til feltet ‘Property’.
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+&lt;div class=&quot;container&quot;&gt;
+    &lt;div class=&quot;row&quot;&gt;
+        &lt;h2&gt;Om meg&lt;/h2&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;row&quot;&gt;
+        &lt;div class=&quot;col-md-2&quot;&gt;
+            @@Html.LabelFor(m =&gt; m.FirstName, &quot;Fornavn:&quot;)
+        &lt;/div&gt;
+        &lt;div class=&quot;col-md-10&quot;&gt;
+            @@Model.FirstName
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;row&quot;&gt;
+        &lt;div class=&quot;col-md-2&quot;&gt;
+            @@Html.LabelFor(m =&gt; m.LastName, &quot;Etternavn:&quot;)
+        &lt;/div&gt;
+        &lt;div class=&quot;col-md-10&quot;&gt;
+            @@Model.LastName
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;row&quot;&gt;
+        &lt;div class=&quot;col-md-2&quot;&gt;
+            @@Html.LabelFor(m =&gt; m.BirthDate, &quot;F&#248;dt:&quot;)
+        &lt;/div&gt;
+        &lt;div class=&quot;col-md-10&quot;&gt;
+            @@Model.BirthDate.ToString(&quot;dd.MM.yyyy&quot;)
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;row&quot;&gt;
+        &lt;div class=&quot;col-md-2&quot;&gt;
+            @@Html.LabelFor(m =&gt; m.AboutMe, &quot;Beskrivelse:&quot;)
+        &lt;/div&gt;
+        &lt;div class=&quot;col-md-10&quot;&gt;
+            @@Model.AboutMe
+        &lt;/div&gt;
+    &lt;/div&gt;
+    @@if (Request.IsAuthenticated)
+    {
+        &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;col-md-2&quot;&gt;
+                @@Html.ActionLink(&quot;Rediger&quot;, &quot;EditAbout&quot;)
+            &lt;/div&gt;
+&lt;/div&gt;
+    }
+&lt;/div&gt;
+        </pre>
+</div>
+
+<div class="row">
+    <h3>Oppgave 4: Redigering av About</h3>
+
+    <div class="task">
+        Det burde selvfølgelig være mulig å redigere innholdet i “About”-siden. Denne oppgaven vil være noe mer arbeid, så vi har delt den opp i del-oppgaver.
+    </div>
+</div>
+
+<div class="row">
+    <h4>Oppgave 4a</h4>
+    <div class="task">
+        I HomeController.cs finner vi to EditAbout metoder. Den ene har HttpGet-attributet, og har ingen parametere. Det er denne metoden som kalles når man går til urlen: /Home/EditAbout, og som returnerer EditAbout.cshtml viewet.
+
+        Vi vil navigere til denne kontrolleren fra AboutMe.cshtml viewet. Vi må derfor legge til en link som kaller EditAbout-metoden.
+    </div>
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Vi kan bruke &#64;Html.ActionLink(“link tekst”, “metode”). På grunn av navnekonvensjoner vil det automatisk antas at at metoden befinner seg i Home-controlleren, ettersom viewet About.cshtml befinner seg i en View-mappe med samme navn (“Home”).
+
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+ &lt;div class="row"&gt;
+     &#64;Html.ActionLink("Rediger", "EditAbout")
+&lt;/div&gt;
+        </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 4b</h4>
+    <div class="task">
+        I metoden EditAbout henter vi ut informasjon som ligger i databasen. Viewmodelen er for øyeblikket tom. Vi må populere viewmodellen med de eksisterende dataene fra databasen, for at de skal vises i viewet.
+    </div>
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Feltene fra AboutInformation-objektet som ble hentet fra databasen må kopieres over i AboutInformationViewModel-objektet som vi skal bruke i EditAbout-viewet.
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+public ActionResult EditAbout()
+{
+    var repository = new AboutRepository();
+    var aboutInformation = repository.GetAboutInformation();
+    if (aboutInformation == null)
+    {
+        return View(new AboutInformationViewModel());
+    }
+    var model = new AboutInformationViewModel()
+    {
+        AboutMe = aboutInformation.AboutMe,
+        FirstName = aboutInformation.FirstName,
+        LastName = aboutInformation.LastName,
+        BirthDate = aboutInformation.BirthDate,
+    };
+    return View(model);
+}
+        </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 4c</h4>
+    <div class="task">
+        Legg til viewet som skal vise skjemaet hvor man kan redigere informasjonen. Siden vi ikke definerer noe spesifikt navn til viewet som returneres i EditAbout-metoden, antas det at det finnes et view med samme navn (EditAbout.cshtml) i /Views/Home-mappen.
+    </div>
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Høyreklikk på /Views/Home-mappen og velg ‘Add view..’.  Kall viewet for ‘EditAbout’ og sett Template til ‘Empty’ og Model Class til AboutInformationViewModel.cs
+        Dersom man høyreklikker på controller-metoden kan man trykke på “Add view” for å legge til ett view raskt.
+        Hint: Husk at viewet må referere en modell ved å bruke &#64;model &lt;Model&gt;
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+@@model BlogApplication.Models.AboutInformationViewModel
+@@{
+    ViewBag.Title = "EditAboutMe";
+}
+&lt;div class="container"&gt;
+&lt;div class="row"&gt;
+    &lt;/div&gt;
+&lt;/div>
+
+        </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 4d</h4>
+    <div class="task">
+        Legg til et skjema (form) i siden hvor man skal kunne redigere informasjonen i det nye viewet.
+        I formen behøves det input-elementer for hvert av feltene i viewmodellen. Disse trenger ‘type’ attributtet ‘text’ eller tilsvarende.
+        Det trenges også et input element for å submitte hele skjemaet. Denne vil derfor trenge type-attributtet ‘submit’.
+
+        Se på AddPost.cshtml for inspirasjon.
+    </div>
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Dere kan bruke @@using (Html.BeginForm()) {  } for å lage ett form. Innenfor krøll-parentesene kan vi plassere html, eller html-genererende hjelpemetoder (som LabelFor(), TextAreaFor() og TextBoxFor()).
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+&lt;div class="container"&gt;
+    &lt;div class="row create-post-form"&gt;
+        @@using (Html.BeginForm())
+        {
+            @@Html.LabelFor(m =&gt; m.FirstName, "Fornavn: ")
+            @@Html.TextBoxFor(m =&gt; m.FirstName, new { @@class = "form-control" })
+            @@Html.LabelFor(m =&gt; m.LastName, "Etternavn: ")
+            @@Html.TextBoxFor(m =&gt; m.LastName, new { @@class = "form-control" })
+            @@Html.LabelFor(m =&gt; m.BirthDate, "Fødselsdag")
+            @@Html.TextBoxFor(m =&gt; m.BirthDate, new { @@class = "form-control datepicker", data_date = "01.01.1990" })
+            @@Html.LabelFor(m =&gt; m.AboutMe, "Om meg")
+            @@Html.TextAreaFor(m =&gt; m.AboutMe, new { @@class = "form-control", rows = "5" })
+        &lt;br /&gt;
+        &lt;input type="submit" value="Lagre" class="btn btn-primary" /&gt;
+        }
+    &lt;/div&gt;
+&lt;/div&gt;
+@@section scripts
+{
+        &lt;script&gt;
+    $(".datepicker").datepicker({
+        format: "dd.mm.yyyy",
+        weekStart: 1
+    });
+    &lt;/script&gt;
+}
+        </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 4e</h4>
+    <div class="task">
+        Når man trykker på submit knappen, vil nå EditAbout-metoden i HomeController kalles. Ettersom @@Html.BeginForm() bruker FormMethod.Post som standard, vil EditAbout-metoden med [HttpPost]-attributtet bli kalt.
+
+        Denne metoden må nå lagre de nye dataene vi fylte inn i skjemaet. Hvis hjelpemetodene ble brukt, så vil html-elementene ha fått samme navn som feltene til AboutInformationViewModellen. Dette er viktig for at parametere til EditAbout-metoden skal bil fylt med data fra skjemaet. Dersom du har skrevet input elemente fra bunn selv, så må det passes på at “name”-attributtet stemmer overens med felt-navnene til viewmodelen som EditAbout-metoden forventer.
+    </div>
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Bruk AboutRepository sin EditAboutInformation-metode for å persistere dataene om deg selv.
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+[HttpPost]
+[Authorize]
+public ActionResult EditAbout(AboutInformationViewModel viewmodel)
+{
+        _repository.EditAboutInformation(new AboutInformation
+       {
+           AboutMe = viewmodel.AboutMe,
+           BirthDate = viewmodel.BirthDate,
+           FirstName = viewmodel.FirstName,
+           LastName = viewmodel.LastName,
+       });
+       return RedirectToAction("About");
+}
+        </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 4f</h4>
+    <div class="task">
+        Hvis vi nå starter opp applikasjonen så vil vi se at ‘Rediger’-linken fra ‘Om meg’-siden er synlig selv om vi ikke er logget inn. Dette vil vi endre på.
+
+        Request.IsAuthenticated kan sjekkes for å se om brukeren er innlogget eller ikke. For å skjule ‘rediger’-linken for uvedkommende, kan vi plassere den inne i en if-setning som sjekker IsAuthenticated feltet.
+    </div>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+@@if (Request.IsAuthenticated) 
+{ 
+&lt;div class="row"&gt;
+    		@@Html.ActionLink("Rediger", "EditAbout")
+ 	&lt;/div&gt;
+}
+        </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 4g</h4>
+    <div class="task">
+        Selv om vi har nå skjult linken, kan man fortsatt navigere til rediger-siden ved å skrive URLen /Home/EditAbout/ . Bruk Authorize - attributtet på EditAbout-metodene for å kreve at bruker er logget inn.
+    </div>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+[HttpGet]
+[Authorize]
+public ActionResult EditAbout()
+{
+ 	...
+}
+[HttpPost]
+[Authorize]
+public ActionResult EditAbout(AboutInformationViewModel model)
+{
+ 	...
+}
+        </pre>
+</div>
+
+<div class="row">
+    <h3>Oppgave 5: Kommentarer</h3>
+
+    <div class="task">
+        Bloggen vår blir kjedelig om ikke internett-ekspertene kan fortelle oss hvor feil vi tar. Vi må derfor legge til funksjonalitet for andre å kunne kommentere på postene våre.
+    </div>
+</div>
+
+<div class="row">
+    <h4>Oppgave 5a</h4>
+    <div class="task">
+        I ViewPost-viewet må det legges til en form hvor brukere kan legge til kommentarer. For å holde markupen ryddig, velger vi å plassere skjemaet i noe som kalles et partial view. Et partial view er et view som kan limes inn i andre, som brukes for å samle kode som er ofte gjenbrukt, eller gjøre html-koden mer lesbar. Partial views følger navnekonvensjonen  “_Name”. Et eksempel på et partial view i vårt prosjekt er /Views/Post/_AddComment-viewet, som vi nå skal bruke for å plassere skjemaet for opprettelse av ny kommentar i.
+
+        Bruk @@Html.Partial(“ViewName”, ViewModel) hjelpemetoden for å generere _AddComment-partialviewet i ViewPost.cshtml. Som vi ser fra model objektet i _AddComment.cshtml, så forventes det at viewmodellen i Partial()-hjelpemetoden er av klassen CommentViewModel.
+
+    </div>
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        CommentViewModelen som _AddComment.cshtml forventer å få inn, må ha PostIDen til blogginnlegget den refererer til, satt. Siden viewmodellen til ViewPost.cshtml er en PostViewModel, kan PostIDen leses ut fra denne.
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+        &lt;div class="comment-section"&gt;
+        &lt;div class="row"&gt;
+        &lt;h3&gt;Kommentarer&lt;/h3&gt;
+       &lt;/div&gt;
+&lt;div class="row"&gt;
+          @@Html.Partial("_AddComment", new CommentViewModel { PostId = Model.PostId })
+       &lt;/div&gt;
+&lt;/div&gt;
+        </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 5b</h4>
+    <div class="task">
+        _AddComment.cshtml mangler skjema for å lage ny kommentar.  Legg til skjema på tilsvarende måte som ble gjort for å opprette ny ‘Om meg’-side. Dette skjemaet skal sendes til “AddNewComment”-metoden i PostController.cs. Denne metoden finnes ikke foreløpig, men denne metoden skal vi opprette i neste oppgave. @@Html.BeginForm(“metodenavn”, “controllernavn”) kan brukes for å spesifisere hvilken metode skjemaet skal sendes til.
+    </div>
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Vi vil ikke fylle inn verdi for PostIDen, siden vi da mister koblingen til blogginnlegget vi skal kommentere. Bruk derfor hjelpemetoden @@Html.HiddenFor(model => model.&lt;Property&gt;) for at dette feltet blir skjult i skjemaet, samtidig som det blir sendt med til kontroller-metoden
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+@@using (Html.BeginForm("AddNewComment", "Post"))
+{
+    @@Html.LabelFor(m => m.OwnerName, "Navn")
+    @@Html.TextBoxFor(m => m.OwnerName, new { @@class = "form-control" })
+    @@Html.LabelFor(m => m.Content, "Kommentar")
+    @@Html.TextBoxFor(m => m.Content, new { @@class = "form-control" })
+    @@Html.HiddenFor(x => x.PostId)
+&lt;br /&gt;
+&lt;input type="submit" value="Legg til" class="btn btn-primary" /&gt;
+}
+        </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 5c</h4>
+    <div class="task">
+        I PostController.cs må det legges til  metoden AddNewComment(CommentViewModel model) som BeginForm()-metoden i _AddComment.cshtml kaller. Denne metoden skal bruke _postRepository for å legge til ny kommentar til blogg-innlegget. Når vi er ferdig vil vi laste ViewPost.cshtml-viewet på nytt. For dette har vi laget en hjelpemetode i PostController.cs, RedirectToPost(int postId), som dere til slutt må returnere.
+    </div>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+[HttpPost]
+public ActionResult AddNewComment(CommentViewModel model)
+{
+    var comment = new Comment
+    {
+        Content = model.Content,
+        OwnerName = model.OwnerName,
+        Created = DateTime.Now,
+        PostId = model.PostId
+    };
+    _postRepository.AddCommentToPost(comment, model.PostId);
+    return RedirectToPost(model.PostId);
+}
+        </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 5d</h4>
+    <div class="task">
+        Det som gjenstår nå, er å vise kommentarene til et blogg-innlegg på ViewPost-viewet. Til det, finnes det et eksisterende partial view i /Views/Post/-mappen som heter _Comment.cshtml. Dette partial viewet har allerede det som trengs for å vise innholdet til en kommentar, så det eneste som gjenstår er å bruke dette partial viewet i ViewPost.cshtml.
+    </div>
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Modellen som kommer inn til ViewPost-viewet (PostViewModel) inneholder en liste med kommentarer (Model.Comments), og for hver av disse må vi bruke @@Html.Partial() til å skrive ut innholdet til kommentarene.
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+        &lt;div class="row"&gt;
+        &lt;h3&gt;Kommentarer&lt;/h3&gt;
+&lt;/div&gt;
+@@if (Model.Comments.Any())
+{
+     foreach (var comment in Model.Comments)
+     {
+         @@Html.Partial("_Comment", comment)
+     }
+}
+else
+{
+        &lt;div class="row"&gt;
+      Bli den første til å kommentere på dette innlegget.
+    &lt;/div&gt;
+}
+        </pre>
+</div>
+
+<div class="row">
+    <h3>Ekstra Oppgaver</h3>
+
+    <div class="task">
+        Her er noen ekstra utfordrende ekstraoppgaver. Disse oppgavene har ikke like god beskrivelse og løsningsforslag som de tidligere oppgavene, men spør gjerne om hjelp.
+    </div>
+</div>
+
+<div class="row">
+    <h4>Ekstra Oppgave 1</h4>
+    <div class="task">
+        Gi besøkende muligheten til å legge igjen epostadressen sin når de skriver en kommentar. Her må dere bruke Entity Framework migrations. Dette lar deg gjøre endringer på klassene i ApplicationModel\Models og generere nye database tabeller.
+    </div>
+</div>
+
+<div class="row">
+    <h4>Ekstra Oppgave 2</h4>
+    <div class="task">
+        Input validering på poster og kommentarer, og sanitering av kommentarer. 
+    </div>
+</div>
+
+<div class="row">
+    <h4>Ekstra Oppgave 3</h4>
+    <div class="task">
+        Legg inn beskyttelse mot xss-angrep
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(function() {
+            $('.showHint').click(function() {
+                $(this).next('.hint').toggle();
+            });
+            $('.showSolution').click(function() {
+                $(this).next('.solution').toggle();
+            });
+        });
+
+    </script>
+}

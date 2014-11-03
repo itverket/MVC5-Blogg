@@ -1,0 +1,55 @@
+﻿@model BlogApplication.Models.AboutInformationViewModel
+@{
+    ViewBag.Title = "Om meg";
+}
+
+<div class="container">
+    <div class="row">
+        <h2>Om meg</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.FirstName, "Fornavn:")
+        </div>
+        <div class="col-md-10">
+            @Model.FirstName
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.LastName, "Etternavn:")
+        </div>
+        <div class="col-md-10">
+            @Model.LastName
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.BirthDate, "Født:")
+        </div>
+        <div class="col-md-10">
+            @Model.BirthDate.ToString("dd.MM.yyyy")
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.AboutMe, "Beskrivelse:")
+        </div>
+        <div class="col-md-10">
+            @Model.AboutMe
+        </div>
+    </div>
+
+    @if (Request.IsAuthenticated)
+    {
+        <div class="row">
+            <div class="col-md-2">
+                @Html.ActionLink("Rediger", "EditAbout")
+            </div>
+        </div>
+    }
+</div>

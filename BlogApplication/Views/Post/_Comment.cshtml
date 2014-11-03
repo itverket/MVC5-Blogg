@@ -1,0 +1,30 @@
+﻿@using BlogApplication.Extensions
+@model BlogApplication.Models.CommentViewModel
+<div class="comment">
+    <div class="row">
+        <p class="lead">
+            @Model.OwnerName skrev på @Model.Created.ToShortDateString()
+        </p>
+    </div>
+    <div class="row">
+        <p>
+            @Model.Content
+        </p>
+    </div>
+
+
+    @if (Request.IsAuthenticated)
+    {
+        <div class="row">
+            @using (Html.BeginForm("DeleteComment", "Post", FormMethod.Post, new { @class = "form create-post-form", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" value="@Model.Id" name="commentId" />
+                <input type="hidden" value="@Model.PostId" name="postId" />
+
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <input type="submit" value="Slett kommentar" class="btn btn-sm btn-danger pull-right" />
+            }
+        </div>
+    }
+</div>

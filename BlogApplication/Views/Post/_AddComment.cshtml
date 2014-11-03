@@ -1,0 +1,17 @@
+﻿@model BlogApplication.Models.CommentViewModel
+
+<div class="container">
+    <div class="row create-post-form">
+        @using (Html.BeginForm("AddNewComment", "Post"))
+        {
+            @Html.LabelFor(m => m.OwnerName, "Navn")
+            @Html.TextBoxFor(m => m.OwnerName, new { @class = "form-control" })
+            @Html.LabelFor(m => m.Content, "Kommentar")
+            @Html.TextBoxFor(m => m.Content, new { @class = "form-control" })
+            @Html.HiddenFor(x => x.PostId)
+            <br />
+            <input type="submit" value="Legg til" class="btn btn-primary" />
+        }
+    </div>
+</div>
+

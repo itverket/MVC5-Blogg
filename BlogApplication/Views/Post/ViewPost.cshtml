@@ -1,0 +1,60 @@
+﻿@using System.Net.Mime
+@using System.Reflection
+@using System.Web.UI.WebControls
+@using BlogApplication.Extensions
+@using BlogApplication.Models
+@model BlogApplication.Models.PostViewModel
+@{
+    ViewBag.Title = @Model.Title;
+}
+
+<div class="container">
+    <div class="row">
+        <h2>@Model.Title<small class="pull-right">@Model.Created.ToShortDateString()</small></h2>
+    </div>
+    <div class="row">
+        <p class="lead">
+            @Model.Introduction
+        </p>
+    </div>
+    <div class="row">
+        @Model.Content
+    </div>
+    @if (Request.IsAuthenticated)
+    {
+        <div class="row">
+            @using (Html.BeginForm("DeletePost", "Post", FormMethod.Post, new { @class = "form create-post-form", role = "form" }))
+            {
+                <input type="hidden" value="@Model.PostId" name="id" />
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                <input type="submit" value="Slett innlegg" class="btn btn-sm btn-danger" />
+            }
+
+        </div>
+    }
+
+    <div class="comment-section">
+        <div class="row">
+            <h3>Kommentarer</h3>
+        </div>
+        @if (Model.Comments.Any())
+        {
+
+            foreach (var comment in Model.Comments)
+            {
+                @Html.Partial("_Comment", comment)
+            }
+        }
+        else
+        {
+            <div class="row">
+                Bli den første til å kommentere på dette innlegget.
+            </div>
+        }
+
+        <div class="row">
+            @Html.Partial("_AddComment", new CommentViewModel { PostId = Model.PostId })
+        </div>
+    </div>
+    
+</div>

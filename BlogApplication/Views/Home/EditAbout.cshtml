@@ -1,0 +1,32 @@
+﻿@model BlogApplication.Models.AboutInformationViewModel
+@{
+    ViewBag.Title = "Rediger om meg";
+}
+<div class="container">
+    <div class="row create-post-form">
+        @using (Html.BeginForm())
+        {
+            @Html.LabelFor(m => m.FirstName, "Fornavn: ")
+            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+            @Html.LabelFor(m => m.LastName, "Etternavn: ")
+            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+            @Html.LabelFor(m => m.BirthDate, "Fødselsdag")
+            @Html.TextBoxFor(m => m.BirthDate, new { @class = "form-control datepicker", data_date = "01.01.1990" })
+            @Html.LabelFor(m => m.AboutMe, "Om meg")
+            @Html.TextAreaFor(m => m.AboutMe, new { @class = "form-control", rows = "5" })
+            <br />
+            <input type="submit" value="Lagre" class="btn btn-primary" />
+        }
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(".datepicker").datepicker({
+            format: "dd.mm.yyyy",
+            weekStart: 1
+        });
+    </script>
+}
+

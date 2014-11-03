@@ -1,0 +1,45 @@
+﻿@model BlogApplication.Models.ViewPostsViewModel
+@{
+    ViewBag.Title = "Se innlegg";
+}
+<div class="container">
+    <div class="row">
+        <h1>Siste Innlegg</h1>
+    </div>
+    @if (Model.Posts.Count > 0)
+    {
+        foreach (var postViewModel in Model.Posts)
+        {
+            <div class="row">
+                <h2>@Html.ActionLink(postViewModel.Title, "ViewPost", new { id = postViewModel.PostId })</h2>
+            </div>
+            <div class="row">
+                <p class="lead">
+                    @postViewModel.Introduction
+                </p>
+            </div>
+            <div class="row">
+                <p>
+                    @postViewModel.Content
+                </p>
+            </div>
+        }
+
+        <div class="row">
+            @if(@Model.PrevPageExists)
+            {
+                @Html.ActionLink("Forrige side", "ViewPosts", "Post", new { startPos = Model.CurrentPos - 10 }, null)
+            }
+
+            @if(@Model.NextPageExists)
+            {
+                @Html.ActionLink("Neste side", "ViewPosts", "Post", new { startPos = Model.CurrentPos + 10 }, null)
+            }
+            
+        </div>
+    }
+    else
+    {
+        <h4>Ingen poster har blitt laget enda!</h4>
+    }
+</div>
