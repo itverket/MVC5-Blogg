@@ -425,7 +425,99 @@ else
 </div>
 
 <div class="row">
-    <h3>Ekstra Oppgaver</h3>
+    <h4>Oppgave 6a</h4>
+    <div class="task">
+        Vi ønsker (av en eller annen grunn) at det skal være mulig å hente postene fra bloggen vår uten å måtte åpne siden vår. Legg til ett nytt prosjekt til løsningen vår hvor vi kan lage ett web-api som andre kan bruke til å hente postene.
+    </div>
+
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Høyre-klikk på løsning, velg "Add new project". Velg ASP.NET Web Application (C# versjonen) og velg ett navn (i løsningforslaget heter prosjektet bare "WebApi"). Velg "Empty Web Applciation"-templaten (gjerne .NET versjon 4.5.2), og ticka av "WebApi"-boksen. Skru av både authentication og host in azure.
+    </p>
+</div>
+
+<div class="row">
+    <h4>Oppgave 6b</h4>
+    <div class="task">
+        Vi har nå ett ganske minimalt prosjekt. Dere vil se at det under en folder som heter "App_Start" ligger en klasse som heter "WebApiConfig". Dette er en klasse hvor det er ment at man gjør oppstartskonfigurasjon. Dere vil også se at det under Global.asax ligger en klasse som heter Global.asax.cs. .NET vil automatisk lete etter noen metoder i Global.asax.cs (blant annet Application_Start() og Application_End() ), så man kan gjøre konfiguering her. Du vil se at i vår Global.asax.cs er det en Application_Start() metode allerede, som kjører WebApiConfig.Register() metoden.
+
+        Nå må vi gjøre ett par ting for å få det nye prosjektet til å spille pent med databasen vår. Gjør følgende:
+
+        1) Høyreklikk på hele solutionen, og velge "Manage NuGet packages for solution"<br />
+        2) Gå på "Installed"-taben<br />
+        3) Finn pakken som heter "Entity Framework". Denne er allerede installert på de 2 andre prosjektene våre.<br />
+        4) Tick boksen på det nye WebApi-prosjektet deres, og trykk på "Install"<br />
+        5) Legg til følgende i Application_Start() metoden i Global.asax.cs klassen i det nye WebApi-prosjektet:<br />
+
+        <pre>
+Database.SetInitializer(new DatabaseInitializer());
+var dbContext = new ApplicationContext();
+dbContext.Database.Initialize(false);
+        </pre>
+
+    </div>
+
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+
+    </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 6b</h4>
+    <div class="task">
+        Vi skal nå legge til funksjonalitet som gjør at man kan gjøre API-kall for å hente ut informasjonen om forfatteren av bloggen. For å gjøre dette må det legges til en controller med en metode som kan håndtere ett request uten parameter som returnerer informasjonen om forfatteren til bloggen. Dere må også hente informasjonen fra ApplicationModel prosjektet.
+    </div>
+
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Her er det ganske mye å gjøre. <br />
+        1) Dere må legge til en ny controller i WebApi-prosjektet. Denne kontrolleren må arve fra ApiController.<br />
+        2) Controlleren må ha en metode som kan hente informasjonen.<br />
+        3) Dere må lage en ny model dere kan returnere i den nye metoden i controlleren deres.<br />
+        4) For å kunne instansiere ett repository må dere referere ApplicationModel-prosjektet i det nye prosjektet.<br />
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+
+Legg til denne klassen under Controllers-folderen:
+public class AboutInformationController : ApiController
+{
+    private AboutRepository _aboutRepository = new AboutRepository();
+    public AboutInformationModel Get()
+    {
+        var information = _aboutRepository.GetAboutInformation();
+        return new AboutInformationModel
+        {
+            AboutMe = information.AboutMe,
+            BirthDate = information.BirthDate,
+            FirstName = information.FirstName,
+            LastName = information.LastName
+        };
+    }
+}
+
+Legg til denne klassen i Models-folderen;
+public class AboutInformationModel
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public DateTime BirthDate { get; set; }
+    public string AboutMe { get; set; }
+}
+
+Høyreklikk på "References" under WebApi-prosjektet. Trykk "Add Reference" -> Projects -> Solution -> ApplicationModel -> Add Reference
+    </pre>
+</div>
+
+
+<div class="row">
+    <h3>Ekstra Oppgaver (for BlogApplication)</h3>
 
     <div class="task">
         Her er noen ekstra utfordrende ekstraoppgaver. Disse oppgavene har ikke like god beskrivelse og løsningsforslag som de tidligere oppgavene, men spør gjerne om hjelp.
