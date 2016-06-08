@@ -454,23 +454,15 @@ Database.SetInitializer(new DatabaseInitializer());
 var dbContext = new ApplicationContext();
 dbContext.Database.Initialize(false);
         </pre>
-
     </div>
-
-    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
-    <p class="hint">
-    </p>
-
-    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
-    <pre class="solution">
-
-    </pre>
 </div>
 
 <div class="row">
-    <h4>Oppgave 6b</h4>
+    <h4>Oppgave 6c</h4>
     <div class="task">
         Vi skal nå legge til funksjonalitet som gjør at man kan gjøre API-kall for å hente ut informasjonen om forfatteren av bloggen. For å gjøre dette må det legges til en controller med en metode som kan håndtere ett request uten parameter som returnerer informasjonen om forfatteren til bloggen. Dere må også hente informasjonen fra ApplicationModel prosjektet.
+
+        Når du er ferdig med denne oppgaven skal du kunne gå starte prosjektet, og legge til /api/AboutInformation til localhosten:port-urlen du får og få ut about-informasjon (i XML format).
     </div>
 
     <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
@@ -488,7 +480,6 @@ dbContext.Database.Initialize(false);
 Legg til denne klassen under Controllers-folderen:
 public class AboutInformationController : ApiController
 {
-    private AboutRepository _aboutRepository = new AboutRepository();
     public AboutInformationModel Get()
     {
         var information = _aboutRepository.GetAboutInformation();
@@ -514,7 +505,143 @@ public class AboutInformationModel
 Høyreklikk på "References" under WebApi-prosjektet. Trykk "Add Reference" -> Projects -> Solution -> ApplicationModel -> Add Reference
     </pre>
 </div>
+<div class="row">
+    <h4>Oppgave 6d</h4>
+    <div class="task">
+        Nå skal vi legge til muligheten til å hente en post basert på ett id-parameter. Du bør helst lage en ny controller med en metode som returnerer en post basert på en id. Når du er ferdig bør du kunne gå til en url lignende dette og få en post: localhost:1234/api/Post/1
+    </div>
 
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Det finnes flere måter å løse dette på, men her er ett par ting det kan være lurt å huske på:<br />
+        1) Husk å lage modeller for både Post og Comment. <br />
+        2) Det kan være lurt å passe på at listen av comments blir initialisert, slik at den aldri er null.<br />
+        3) Annet enn at metoden må ta ett parameter er denne oppgaven veldig lik den forrige.<br />
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+public class PostModel
+{
+    public PostModel()
+    {
+        Comments = new List<CommentModel>();
+    }
+    public int PostId { get; set; }
+    public string Title { get; set; }
+    public string Introduction { get; set; }
+    public string Content { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime Edited { get; set; }
+    public List<CommentModel> Comments { get; set; }
+}
+public class CommentModel
+{
+    public int PostId { get; set; }
+    public int Id { get; set; }
+    public int OwnerId { get; set; }
+    public string OwnerName { get; set; }
+    public string Content { get; set; }
+    public DateTime Created { get; set; }
+}
+
+public class PostController : ApiController
+{
+    public PostModel Get(int id)
+    {
+        var repository = new PostRepository();
+        var post = repository.GetPost(id);
+        var model = new PostModel();
+        if (post != null)
+        {
+            model = new PostModel
+            {
+                PostId = post.PostId,
+                Title = post.Title,
+                Introduction = post.Introduction,
+                Content = post.Content,
+                Created = post.Created,
+                Edited = post.Edited,
+                Comments = post.Comments.Select(comment => new CommentModel
+                {
+                    PostId = comment.PostId,
+                    Id = comment.Id,
+                    Content = comment.Content,
+                    Created = comment.Created,
+                    OwnerId = comment.OwnerId,
+                    OwnerName = comment.OwnerName
+                }).ToList()
+            };
+        }
+        return model;
+    }
+}
+
+    </pre>
+</div>
+
+<div class="row">
+    <h4>Oppgave 6e</h4>
+    <div class="task">
+       Som siste oppgave skal vi legge til ett <bold>veldig</bold> enkelt søk. Vi skal lage en metode som lister ut alle poster som inneholder en gitt string i tittelen. MEN, det er en tvist. Siden søket har med poster å gjøre ønsker vi at det skal ligge i PostController klassen vår. Men vi ønsker at requestet skal se slik ut: api/search/post/querystring
+    </div>
+
+    <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
+    <p class="hint">
+        Her må dere legge til:<br />
+        1) En ny metode i PostRepository for å finne alle poster som inneholder queryStringen. <br />
+        2) En ny metode i PostControlleren som tar i mot en queryString og kaller repository-metoden deres. <br />
+        3) I tillegg må dere legge til en routing til den nye controller-metoden deres. Det kan gjøres ved hjelp av [Route()]-attributen.
+        4) Husk at dere nå skal kunne returnere 0 til mange poster, som alle kan ha 0 til mange kommentarer.
+    </p>
+
+    <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
+    <pre class="solution">
+Repository:
+public List<Post> SearchPostTitles(string queryString)
+{
+    var posts = _dbContext.Posts.Where(post => post.Title.Contains(queryString)).ToList();
+    foreach(var post in posts)
+    {
+        post.Comments = post.Comments ?? new List<Comment>();
+    }
+    return posts;
+}
+PostController:
+[HttpGet]
+[Route("api/search/post/{queryString}")]
+public List<PostModel> Search(string queryString)
+{
+    var repository = new PostRepository();
+    var posts = repository.SearchPostTitles(queryString);
+    var model = new List<PostModel>();
+    if (posts != null)
+    {
+        foreach(var post in posts)
+        {
+            model.Add(new PostModel
+            {
+                PostId = post.PostId,
+                Title = post.Title,
+                Introduction = post.Introduction,
+                Content = post.Content,
+                Created = post.Created,
+                Edited = post.Edited,
+                Comments = post.Comments.Select(comment => new CommentModel {
+                    PostId = comment.PostId,
+                    Id = comment.Id,
+                    Content = comment.Content,
+                    Created = comment.Created,
+                    OwnerId = comment.OwnerId,
+                    OwnerName = comment.OwnerName
+                }).ToList()
+            });
+        }
+    }
+    return model;
+}
+    </pre>
+</div>
 
 <div class="row">
     <h3>Ekstra Oppgaver (for BlogApplication)</h3>

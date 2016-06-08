@@ -88,5 +88,17 @@ namespace ApplicationModel.Repositories
             _dbContext.SaveChanges();
         }
 
+        public List<Post> SearchPostTitles(string queryString)
+        {
+            var posts = _dbContext.Posts.Where(post => post.Title.Contains(queryString)).ToList();
+
+            foreach(var post in posts)
+            {
+                post.Comments = post.Comments ?? new List<Comment>();
+            }
+
+            return posts;
+        }
+
     }
 }
