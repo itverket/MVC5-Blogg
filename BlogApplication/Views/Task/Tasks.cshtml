@@ -425,14 +425,26 @@ else
 </div>
 
 <div class="row">
+    <h3>Oppgave 6: Web API</h3>
+
+    <div class="task">
+        Nå skal vi la folk hente ut noen meget interessante data fra siden vår uten å måtte besøke den i browseren.
+    </div>
+</div>
+
+<div class="row">
     <h4>Oppgave 6a</h4>
     <div class="task">
         Vi ønsker (av en eller annen grunn) at det skal være mulig å hente postene fra bloggen vår uten å måtte åpne siden vår. Legg til ett nytt prosjekt til løsningen vår hvor vi kan lage ett web-api som andre kan bruke til å hente postene.
+
+        Vi ønsker også at begge prosjektene skal startes når vi starter løsning vår.
     </div>
 
     <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
     <p class="hint">
         Høyre-klikk på løsning, velg "Add new project". Velg ASP.NET Web Application (C# versjonen) og velg ett navn (i løsningforslaget heter prosjektet bare "WebApi"). Velg "Empty Web Applciation"-templaten (gjerne .NET versjon 4.5.2), og ticka av "WebApi"-boksen. Skru av både authentication og host in azure.
+
+        For å sette flere prosjekter som startup projects, høyreklikk på løsningen, velg Set Startup Projects, Multiple Startup Projects og under Action velg Start for både BlogApplication og det nye prosjektet. Velg så Apply og Ok.
     </p>
 </div>
 
@@ -441,7 +453,7 @@ else
     <div class="task">
         Vi har nå ett ganske minimalt prosjekt. Dere vil se at det under en folder som heter "App_Start" ligger en klasse som heter "WebApiConfig". Dette er en klasse hvor det er ment at man gjør oppstartskonfigurasjon. Dere vil også se at det under Global.asax ligger en klasse som heter Global.asax.cs. .NET vil automatisk lete etter noen metoder i Global.asax.cs (blant annet Application_Start() og Application_End() ), så man kan gjøre konfiguering her. Du vil se at i vår Global.asax.cs er det en Application_Start() metode allerede, som kjører WebApiConfig.Register() metoden.
 
-        Nå må vi gjøre ett par ting for å få det nye prosjektet til å spille pent med databasen vår. Gjør følgende:
+        Nå må vi gjøre ett par ting for å få det nye prosjektet til å spille pent med databasen vår. Gjør følgende:<br />
 
         1) Høyreklikk på hele solutionen, og velge "Manage NuGet packages for solution"<br />
         2) Gå på "Installed"-taben<br />
@@ -476,7 +488,6 @@ dbContext.Database.Initialize(false);
 
     <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
     <pre class="solution">
-
 Legg til denne klassen under Controllers-folderen:
 public class AboutInformationController : ApiController
 {
@@ -492,7 +503,6 @@ public class AboutInformationController : ApiController
         };
     }
 }
-
 Legg til denne klassen i Models-folderen;
 public class AboutInformationModel
 {
@@ -501,7 +511,6 @@ public class AboutInformationModel
     public DateTime BirthDate { get; set; }
     public string AboutMe { get; set; }
 }
-
 Høyreklikk på "References" under WebApi-prosjektet. Trykk "Add Reference" -> Projects -> Solution -> ApplicationModel -> Add Reference
     </pre>
 </div>
@@ -525,7 +534,7 @@ public class PostModel
 {
     public PostModel()
     {
-        Comments = new List<CommentModel>();
+        Comments = new List&lt;CommentModel&gt;();
     }
     public int PostId { get; set; }
     public string Title { get; set; }
@@ -533,7 +542,7 @@ public class PostModel
     public string Content { get; set; }
     public DateTime Created { get; set; }
     public DateTime Edited { get; set; }
-    public List<CommentModel> Comments { get; set; }
+    public List&lt;CommentModel&gt; Comments { get; set; }
 }
 public class CommentModel
 {
@@ -544,7 +553,6 @@ public class CommentModel
     public string Content { get; set; }
     public DateTime Created { get; set; }
 }
-
 public class PostController : ApiController
 {
     public PostModel Get(int id)
@@ -576,14 +584,13 @@ public class PostController : ApiController
         return model;
     }
 }
-
     </pre>
 </div>
 
 <div class="row">
     <h4>Oppgave 6e</h4>
     <div class="task">
-       Som siste oppgave skal vi legge til ett <bold>veldig</bold> enkelt søk. Vi skal lage en metode som lister ut alle poster som inneholder en gitt string i tittelen. MEN, det er en tvist. Siden søket har med poster å gjøre ønsker vi at det skal ligge i PostController klassen vår. Men vi ønsker at requestet skal se slik ut: api/search/post/querystring
+        Som siste oppgave skal vi legge til ett <b>veldig</b> enkelt søk. Vi skal lage en metode som lister ut alle poster som inneholder en gitt string i tittelen. MEN, det er en tvist. Siden søket har med poster å gjøre ønsker vi at det skal ligge i PostController klassen vår. Men vi ønsker at requestet skal se slik ut: api/search/post/querystring
     </div>
 
     <button class="showHint btn btn-xs btn-primary">Vis Hint</button>
@@ -598,23 +605,23 @@ public class PostController : ApiController
     <button class="showSolution btn btn-xs btn-warning">Vis løsning</button>
     <pre class="solution">
 Repository:
-public List<Post> SearchPostTitles(string queryString)
+public List&lt;Post&gt; SearchPostTitles(string queryString)
 {
     var posts = _dbContext.Posts.Where(post => post.Title.Contains(queryString)).ToList();
     foreach(var post in posts)
     {
-        post.Comments = post.Comments ?? new List<Comment>();
+        post.Comments = post.Comments ?? new List&lt;Comment&gt;();
     }
     return posts;
 }
 PostController:
 [HttpGet]
 [Route("api/search/post/{queryString}")]
-public List<PostModel> Search(string queryString)
+public List&lt;PostModel&gt; Search(string queryString)
 {
     var repository = new PostRepository();
     var posts = repository.SearchPostTitles(queryString);
-    var model = new List<PostModel>();
+    var model = new List&lt;PostModel&gt;();
     if (posts != null)
     {
         foreach(var post in posts)
